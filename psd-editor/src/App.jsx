@@ -1,27 +1,27 @@
-import React, { useState } from "react";
-import FileUploader from "./components/FileUploader";
-import PsdViewer from "./components/PsdViewer";
-import AiEpsViewer from "./components/AiEpsViewer";
+import { useState } from "react";
+import CanvasEditor from "./components/CanvasEditor";
+import Toolbar from "./components/Toolbar";
+import { parseFile } from "./utils/fileParser";
 
-const App = () => {
+function App() {
   const [file, setFile] = useState(null);
-  const [fileType, setFileType] = useState(null);
 
-  const handleFileUpload = (selectedFile) => {
-    setFile(selectedFile);
-    if (selectedFile.name.endsWith(".psd")) setFileType("psd");
-    else if (selectedFile.name.endsWith(".ai") || selectedFile.name.endsWith(".eps"))
-      setFileType("ai-eps");
+  const handleFileUpload = async (event) => {
+    const uploadedFile = event.target.files[0];
+    if (uploadedFile) {
+      const parsedData = await parseFile(uploadedFile);
+      setFile(parsedData);
+    }
   };
 
   return (
-    <div>
-      <h1>File Viewer</h1>
-      <FileUploader onFileUpload={handleFileUpload} />
-      {file && fileType === "psd" && <PsdViewer file={file} />}
-      {file && fileType === "ai-eps" && <AiEpsViewer file={file} />}
+    <div className="flex flex-col items-center justify-center h-screen bg-gray-900 text-white">
+      <h1 className="text-2xl font-bold mb-4">PSD, AI, EPS Web Editor</h1>
+      <input type="file" onChange={handleFileUpload} className="mb-4" />
+      <Toolbar />
+      {file && <CanvasEditor fileData={file} />}
     </div>
   );
-};
+}
 
 export default App;
